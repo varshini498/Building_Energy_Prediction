@@ -9,16 +9,23 @@ def save_plot_to_base64(fig):
     buffer = io.BytesIO()
     fig.savefig(buffer, format='png', bbox_inches='tight', dpi=150)
     buffer.seek(0)
-    image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+    image_base64 = base64.b64encode(buffer.read()).decode('latin-1')
     plt.close(fig)
     return image_base64
 
-def run_day9_anomaly_detection(file_path):
-    df = pd.read_csv(file_path, index_col='Timestamp', parse_dates=True)
+def run_day9_anomaly_detection(df):
     df.dropna(inplace=True)
-    
     results = {}
     
+    # --- FIX: Check if the DataFrame is empty after dropping NaNs ---
+    if df.empty:
+        print("Warning: DataFrame is empty. Skipping anomaly detection.")
+        return {'anomaly_plot': None, 'anomalies_found': 0}, df
+        
+    if 'Residuals' not in df.columns:
+        print("Warning: Residuals not found for anomaly detection. Skipping.")
+        return {'anomaly_plot': None, 'anomalies_found': 0}, df
+        
     isolation_forest = IsolationForest(contamination=0.01, random_state=42)
     df['Is_Anomaly'] = isolation_forest.fit_predict(df[['Residuals']])
     anomalies = df[df['Is_Anomaly'] == -1]
@@ -32,7 +39,4 @@ def run_day9_anomaly_detection(file_path):
     results['anomaly_plot'] = save_plot_to_base64(fig)
     results['anomalies_found'] = len(anomalies)
     
-    output_file = 'anomaly_data.csv'
-    df.to_csv(output_file)
-    
-    return results, output_file
+    return results, df

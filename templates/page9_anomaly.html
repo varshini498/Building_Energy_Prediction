@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Step 9: Anomaly Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; }
+        .container { max-width: 1200px; margin: auto; padding: 2rem; }
+        .card { background-color: #161b22; border-radius: 0.5rem; padding: 2rem; border: 1px solid #30363d; }
+    </style>
+</head>
+<body>
+    <div class="container mt-12">
+        <div class="card">
+            <h1 class="text-3xl font-bold text-white mb-4">Step 9: Anomaly Detection</h1>
+            <p class="mb-6">Residuals (prediction errors) have been calculated and anomalies are highlighted below.</p>
+            <p class="mb-2">Anomalies found in the data: <strong>{{ results.anomalies_found }}</strong></p>
+            <div class="text-center">
+                {% if results.anomaly_plot %}
+                <img class="plot-container" src="data:image/png;base64,{{ results.anomaly_plot }}" alt="Anomaly Plot">
+                {% else %}
+                <p class="text-red-400">Anomaly plot could not be generated.</p>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('show_wastage') }}" class="mt-6 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Next: Energy Wastage Analysis</a>
+        </div>
+    </div>
+</body>
+</html>

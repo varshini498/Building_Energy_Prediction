@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Step 11: Wastage Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; }
+        .container { max-width: 1200px; margin: auto; padding: 2rem; }
+        .card { background-color: #161b22; border-radius: 0.5rem; padding: 2rem; border: 1px solid #30363d; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #30363d; }
+        th { background-color: #1f242a; font-weight: 700; }
+        .plot-container { width: 100%; height: auto; max-width: 900px; margin: auto; }
+    </style>
+</head>
+<body>
+    <div class="container mt-12">
+        <div class="card">
+            <h1 class="text-3xl font-bold text-white mb-6">Step 11: Energy Wastage & Usage Analysis</h1>
+            
+            <h2 class="text-2xl font-semibold text-white mb-4">Consumption Distribution</h2>
+            <p class="mb-6">This histogram shows the distribution of normalized energy consumption, highlighting the thresholds for high and low usage events.</p>
+            <div class="text-center mb-8">
+                <img class="plot-container" src="data:image/png;base64,{{ results.consumption_distribution_plot }}" alt="Energy Consumption Distribution Plot">
+            </div>
+
+            <h2 class="text-2xl font-semibold text-white mb-4">Event Analysis Over Time</h2>
+            <p class="mb-6">The plot below visualizes high usage, low usage, and potential wastage events (identified as anomalies in residuals) over the dataset's timeline.</p>
+            <div class="text-center mb-8">
+                <img class="plot-container" src="data:image/png;base64,{{ results.events_time_series_plot }}" alt="Energy Events Time Series Plot">
+            </div>
+
+            <h2 class="text-2xl font-semibold text-white mb-4">Detailed Event Counts</h2>
+            <p class="mb-2">High Usage Events: <strong>{{ results.high_usage_count }}</strong> (top 5% of energy usage)</p>
+            <p class="mb-2">Low Usage Events: <strong>{{ results.low_usage_count }}</strong> (bottom 5% of energy usage)</p>
+            <p class="mb-6">Potential High Wastage Events (Anomalies): <strong>{{ results.wastage_count }}</strong></p>
+
+            <h3 class="text-xl font-semibold text-white mb-2 mt-6">Sample High Usage Events</h3>
+            <div class="overflow-x-auto mb-6">
+                {{ results.high_usage_details | safe }}
+            </div>
+
+            <h3 class="text-xl font-semibold text-white mb-2 mt-6">Sample Low Usage Events</h3>
+            <div class="overflow-x-auto mb-6">
+                {{ results.low_usage_details | safe }}
+            </div>
+
+            <h3 class="text-xl font-semibold text-white mb-2 mt-6">Sample Potential Wastage Events (Anomalies)</h3>
+            <div class="overflow-x-auto mb-6">
+                {{ results.wastage_details | safe }}
+            </div>
+            
+            <a href="{{ url_for('show_comparison') }}" class="mt-6 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Next: Final Comparison Report</a>
+        </div>
+    </div>
+</body>
+</html>

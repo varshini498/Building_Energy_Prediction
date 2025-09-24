@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Step 8: Hybrid Models</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; }
+        .container { max-width: 1200px; margin: auto; padding: 2rem; }
+        .card { background-color: #161b22; border-radius: 0.5rem; padding: 2rem; border: 1px solid #30363d; }
+        .plot-container { width: 100%; height: auto; max-width: 800px; margin: auto; }
+    </style>
+</head>
+<body>
+    <div class="container mt-12">
+        <div class="card">
+            <h1 class="text-3xl font-bold text-white mb-4">Step 8: Hybrid Models</h1>
+            <p class="mb-2">Hybrid LSTM Model R² Score: <strong>{{ '%.4f' | format(metrics.r2) }}</strong></p>
+            <p class="mb-6">Mean Absolute Error (MAE): <strong>{{ '%.4f' | format(metrics.mae) }}</strong></p>
+            <h2 class="text-2xl font-semibold mt-8 mb-4">Training History</h2>
+            <div class="text-center">
+                {% if metrics.loss_plot %}
+                <img class="plot-container" src="data:image/png;base64,{{ metrics.loss_plot }}" alt="Hybrid Model Loss Plot">
+                {% else %}
+                <p>Training loss plot could not be generated.</p>
+                {% endif %}
+            </div>
+            <p class="text-gray-400 text-sm mt-4">The Hybrid LSTM model has been trained and saved as `hybrid_model.h5`.</p>
+            <a href="{{ url_for('show_anomaly') }}" class="mt-6 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Next: Anomaly Detection</a>
+        </div>
+    </div>
+</body>
+</html>
