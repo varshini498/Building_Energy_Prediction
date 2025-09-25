@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Step 11: Wastage Analysis</title>
+    <title>Step 10: Final Report & Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; }
@@ -17,41 +17,49 @@
 <body>
     <div class="container mt-12">
         <div class="card">
-            <h1 class="text-3xl font-bold text-white mb-6">Step 11: Energy Wastage & Usage Analysis</h1>
+            <h1 class="text-3xl font-bold text-white mb-6">Step 10: Final Report & Analysis</h1>
             
-            <h2 class="text-2xl font-semibold text-white mb-4">Consumption Distribution</h2>
-            <p class="mb-6">This histogram shows the distribution of normalized energy consumption, highlighting the thresholds for high and low usage events.</p>
-            <div class="text-center mb-8">
-                <img class="plot-container" src="data:image/png;base64,{{ results.consumption_distribution_plot }}" alt="Energy Consumption Distribution Plot">
-            </div>
-
-            <h2 class="text-2xl font-semibold text-white mb-4">Event Analysis Over Time</h2>
-            <p class="mb-6">The plot below visualizes high usage, low usage, and potential wastage events (identified as anomalies in residuals) over the dataset's timeline.</p>
-            <div class="text-center mb-8">
-                <img class="plot-container" src="data:image/png;base64,{{ results.events_time_series_plot }}" alt="Energy Events Time Series Plot">
-            </div>
-
-            <h2 class="text-2xl font-semibold text-white mb-4">Detailed Event Counts</h2>
-            <p class="mb-2">High Usage Events: <strong>{{ results.high_usage_count }}</strong> (top 5% of energy usage)</p>
-            <p class="mb-2">Low Usage Events: <strong>{{ results.low_usage_count }}</strong> (bottom 5% of energy usage)</p>
+            <h2 class="text-2xl font-semibold text-white mb-4">Energy Usage and Wastage Summary</h2>
+            <p class="mb-2 text-lg text-red-400">Total Energy Wastage in Events: <strong>{{ '%.2f' | format(results.total_wastage_value) }} kWh</strong></p>
+            <p class="mb-2">High Usage Events (Count): <strong>{{ results.high_usage_count }}</strong></p>
+            <p class="mb-2">Low Usage Events (Count): <strong>{{ results.low_usage_count }}</strong></p>
             <p class="mb-6">Potential High Wastage Events (Anomalies): <strong>{{ results.wastage_count }}</strong></p>
 
-            <h3 class="text-xl font-semibold text-white mb-2 mt-6">Sample High Usage Events</h3>
-            <div class="overflow-x-auto mb-6">
-                {{ results.high_usage_details | safe }}
+            <h3 class="text-xl font-semibold text-white mt-6 mb-2">Sample Times for High & Low Usage</h3>
+            <p class="text-sm"><strong>High Usage Times:</strong> <code>{{ results.high_usage_times | join(', ') }}...</code></p>
+            <p class="text-sm mb-6"><strong>Low Usage Times:</strong> <code>{{ results.low_usage_times | join(', ') }}...</code></p>
+
+            <hr class="my-6 border-gray-700">
+
+            <h2 class="text-2xl font-semibold text-white mb-4">Wastage Visualization (Residuals)</h2>
+            <p class="mb-6">This histogram shows the distribution of prediction errors (residuals), with a threshold highlighting potential **Wastage Events**.</p>
+            <div class="text-center mb-8">
+                {% if results.wastage_residual_plot %}
+                <img class="plot-container" src="data:image/png;base64,{{ results.wastage_residual_plot }}" alt="Energy Wastage Residual Plot">
+                {% else %}
+                <p class="text-red-400">Wastage distribution plot could not be generated.</p>
+                {% endif %}
             </div>
 
-            <h3 class="text-xl font-semibold text-white mb-2 mt-6">Sample Low Usage Events</h3>
-            <div class="overflow-x-auto mb-6">
-                {{ results.low_usage_details | safe }}
+            <h2 class="text-2xl font-semibold text-white mb-4">Consumption Distribution & Comparison</h2>
+            <div class="space-y-8">
+                {% if results.consumption_distribution_plot %}
+                <img class="plot-container" src="data:image/png;base64,{{ results.consumption_distribution_plot }}" alt="Consumption Distribution Plot">
+                {% endif %}
             </div>
 
-            <h3 class="text-xl font-semibold text-white mb-2 mt-6">Sample Potential Wastage Events (Anomalies)</h3>
-            <div class="overflow-x-auto mb-6">
-                {{ results.wastage_details | safe }}
+            <hr class="my-8 border-gray-700">
+
+            <h2 class="text-2xl font-semibold text-white mb-4">Model Performance Comparison</h2>
+            <div class="overflow-x-auto mb-8">
+                <pre>{{ results.comparison_table }}</pre>
             </div>
-            
-            <a href="{{ url_for('show_comparison') }}" class="mt-6 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Next: Final Comparison Report</a>
+
+            <h3 class="text-xl font-semibold text-white mb-2">Advanced Output: Best Model</h3>
+            <p class="mb-2"><strong>Best Model by R² Score:</strong> <span class="text-blue-400">{{ results.best_r2_model_name }}</span> (R²: {{ '%.4f' | format(results.best_r2_score) }})</p>
+            <p class="mb-6"><strong>Best Model by Mean Absolute Error (MAE):</strong> <span class="text-blue-400">{{ results.best_mae_model_name }}</span> (MAE: {{ '%.4f' | format(results.best_mae_score) }})</p>
+
+            <a href="{{ url_for('upload_dataset') }}" class="mt-6 inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Start New Analysis</a>
         </div>
     </div>
 </body>

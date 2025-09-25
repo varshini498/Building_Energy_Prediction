@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('Agg') # FIX: Prevents server crashes on plot generation (Tkinter Error)
+
 import os
 import matplotlib.pyplot as plt
 from flask import Flask, render_template, request, session, redirect, url_for
@@ -9,12 +12,14 @@ import base64
 import joblib
 import uuid
 
+# Suppress all warnings for a cleaner output
 warnings.filterwarnings("ignore")
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 plt.style.use('dark_background')
 plt.rcParams.update({'figure.facecolor': '#2b2b2b', 'axes.facecolor': '#2b2b2b', 'figure.edgecolor': '#2b2b2b'})
 
+# Import all necessary pipeline scripts (Day 11 is now integrated into Day 10)
 from day1_preprocessing import run_day1_preprocessing
 from day2_fluctuations import run_day2_fluctuations
 from day3_engineering import run_day3_engineering
@@ -24,8 +29,8 @@ from day6_optimization import run_day6_optimization
 from day7_hybrid import run_day7_hybrid
 from day8_residual_calculation import run_day8_residual_calculation
 from day9_anomaly_detection import run_day9_anomaly_detection
-from day10_wastage_analysis import run_day10_wastage_analysis
-from day11_comparison import run_day11_comparison
+from day10_wastage_analysis import run_day10_wastage_analysis 
+# from day11_comparison import run_day11_comparison # REMOVED
 
 app = Flask(__name__)
 app.secret_key = 'your_strong_secret_key_here'
@@ -33,6 +38,8 @@ TEMP_DIR = 'temp'
 
 if not os.path.exists(TEMP_DIR):
     os.makedirs(TEMP_DIR)
+
+# --- DataFrame Session Management Helpers ---
 
 def save_df_to_temp(df):
     filename = f"{uuid.uuid4()}.pkl"
@@ -56,6 +63,10 @@ def check_df_and_redirect():
 @app.route('/')
 def home():
     return redirect(url_for('upload_dataset'))
+
+# --------------------------
+# PIPELINE ROUTES (DAY 1 - DAY 9)
+# --------------------------
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_dataset():
@@ -138,32 +149,34 @@ def show_anomaly():
     df = check_df_and_redirect()
     if isinstance(df, tuple): return df
     
-    # Run both Day 8 (Residuals) and Day 9 (Anomaly) here
+    # Run Day 8 (Residuals)
     processed_df_with_residuals = run_day8_residual_calculation(df.copy())
+    
+    # Run Day 9 (Anomaly Detection)
     results, processed_df_with_anomaly = run_day9_anomaly_detection(processed_df_with_residuals.copy())
     
     session['filename'] = save_df_to_temp(processed_df_with_anomaly)
     return render_template('page9_anomaly.html', results=results)
 
+# --------------------------
+# DAY 10 (FINAL STEP): WASTAGE & COMPARISON
+# --------------------------
+
 @app.route('/wastage', methods=['GET'])
 def show_wastage():
     df = check_df_and_redirect()
     if isinstance(df, tuple): return df
+    
+    # Run combined Day 10/11 logic
     wastage_results, processed_df = run_day10_wastage_analysis(df.copy())
+    
     session['filename'] = save_df_to_temp(processed_df)
+    
+    # Render the final combined report page
     return render_template('page10_wastage.html', results=wastage_results)
 
-@app.route('/comparison', methods=['GET'])
-def show_comparison():
-    df = check_df_and_redirect()
-    if isinstance(df, tuple): return df
-    comparison_results, processed_df = run_day11_comparison(df.copy())
-    session['filename'] = save_df_to_temp(processed_df)
-    return render_template('page11_comparison.html', results=comparison_results)
-
 if __name__ == '__main__':
-    # Fix for the Tkinter RuntimeError
-    if os.name == 'nt':  # Check if the OS is Windows
+    if os.name == 'nt':
         try:
             import multiprocessing
             multiprocessing.freeze_support()
